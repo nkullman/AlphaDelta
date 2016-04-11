@@ -3,5 +3,8 @@
 *.project
 .settings/
 
+# Ignore IntelliJ project files
+.idea/
+
 # Ignore bin
 bin/
