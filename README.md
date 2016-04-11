@@ -1,2 +1,2 @@
 # AlphaDelta
-Implementation of the Alpha Delta algorithm (Toth 2009) to solve multi-objective mathematical programming problems.
+Implementation of the Alpha Delta algorithm ([Tóth 2009](http://www.ingentaconnect.com/content/saf/fs/2009/00000055/00000002/art00003 "Tóth 2009")) to solve multi-objective mathematical programming models.
