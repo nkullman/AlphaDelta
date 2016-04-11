@@ -1,7 +1,7 @@
 # Ignore Eclipse project files
 *.classpath
 *.project
+.settings/
 
-# Ignore bin folder
+# Ignore bin
 bin/
-
