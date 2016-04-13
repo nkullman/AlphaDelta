@@ -1,10 +1,13 @@
-# Ignore Eclipse project files
+# Eclipse project files
 *.classpath
 *.project
 .settings/
 
-# Ignore IntelliJ project files
+# IntelliJ project files
 .idea/
 
-# Ignore bin
+# bin folder
 bin/
+
+# ipynb checkpoints
+.ipynb_checkpoints/
