@@ -1,6 +1,6 @@
 /**
- * Defines the interface for the set of parameters
- * affecting the implementation of the alpha-delta algorithm.
+ * Defines the interface for the set of parameters affecting the implementation of the alpha-delta algorithm.
+ * This includes the planar tilt (alpha) and the minimum difference in objective values between solutions (delta).
  *
  * @author nkullman
  * @version %I%, %G%
