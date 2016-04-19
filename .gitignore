@@ -12,3 +12,6 @@ bin/
 
 # ipynb checkpoints
 .ipynb_checkpoints/
+
+# Folder of background lit
+literature/
