@@ -62,12 +62,11 @@ public interface IADAlgoInterface {
     void setADSolver(IADAlgoSolver algoSolver);
 
     /**
-     * Uses the solver in the argument to execute the alpha-delta algorithm
+     * Uses this.solver to execute the alpha-delta algorithm
      *
-     * @param solver
      * @return true if the solver executes successfully
      */
-    boolean runSolver(IADAlgoSolver solver);
+    boolean runSolver();
 
     /**
      * Prepares the algorithm for execution. This may include setting the solver, algorithmic parameters, solver parameters, etc.
