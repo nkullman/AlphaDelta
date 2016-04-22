@@ -10,4 +10,32 @@ package mco.alphadelta.framework;
 
 public interface IADAlgoParameters {
 
+    /**
+     *
+     *
+     * @return
+     */
+    double getAlpha_degrees();
+
+    /**
+     * Returns the current array of values for the delta parameters
+     *
+     * @return
+     */
+    double[] getDeltas();
+
+    /**
+     * Set the value for the alpha parameter (in degrees).
+     *
+     * @param alpha_degrees
+     */
+    void setAlpha_degrees(double alpha_degrees);
+
+    /**
+     * Set the value of the delta parameters for all non-principal objectives.
+     *
+     * @param deltas
+     */
+    void setDeltas(double[] deltas);
+
 }
