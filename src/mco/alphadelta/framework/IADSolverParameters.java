@@ -10,4 +10,6 @@ package mco.alphadelta.framework;
 
 public interface IADSolverParameters {
 
+    public void addParam(String paramName, String paramValue);
+
 }
