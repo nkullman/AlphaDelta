@@ -26,4 +26,14 @@ public class ADAlgoSolver_CPLEX extends cplex implements IADAlgoSolver {
         return false;
     }
 
+    @Override
+    public boolean setOutputPath(File outputPath) {
+        return false;
+    }
+
+    @Override
+    public String getType() {
+        return null;
+    }
+
 }
