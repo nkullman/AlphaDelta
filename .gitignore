@@ -20,3 +20,6 @@ bin/
 
 # Folder of background lit
 literature/
+
+# IntelliJ output
+out/
