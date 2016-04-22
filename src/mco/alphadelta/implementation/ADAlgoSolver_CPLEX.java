@@ -1,5 +1,6 @@
 package mco.alphadelta.implementation;
 
+import mco.alphadelta.framework.IADAlgoParameters;
 import mco.alphadelta.framework.IADAlgoSolver;
 import mco.alphadelta.framework.IADSolverParameters;
 
@@ -16,7 +17,13 @@ public class ADAlgoSolver_CPLEX extends cplex implements IADAlgoSolver {
     }
 
     @Override
-    public boolean setParameters(IADSolverParameters solverParameters) {
+    public boolean setSolverParameters(IADSolverParameters solverParameters) {
         return false;
     }
+
+    @Override
+    public boolean setAlgoParameters(IADAlgoParameters algoParameters) {
+        return false;
+    }
+
 }
