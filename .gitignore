@@ -17,3 +17,6 @@ bin/
 *.log
 *.aux
 *.synctex.gz
+
+# Folder of background lit
+literature/
