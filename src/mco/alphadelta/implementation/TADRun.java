@@ -17,6 +17,6 @@ public class TADRun {
         // set the parameters, model, and solver
         algoInterface.prepAlgorithm();
         // run
-        algoInterface.runSolver(algoInterface.getADSolver());
+        algoInterface.runSolver();
     }
 }
