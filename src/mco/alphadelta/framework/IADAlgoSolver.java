@@ -24,5 +24,12 @@ public interface IADAlgoSolver {
      * @param solverParameters the params to to configure the solver
      * @return true if the parameters are set successfully.
      */
-    public boolean setParameters(IADSolverParameters solverParameters);
+    public boolean setSolverParameters(IADSolverParameters solverParameters);
+
+    /**
+     * Set the parameters for the alpha-delta algorithm that the solver will use during its execution
+     * @param algoParameters
+     * @return
+     */
+    public boolean setAlgoParameters(IADAlgoParameters algoParameters);
 }
