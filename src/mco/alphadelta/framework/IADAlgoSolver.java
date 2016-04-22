@@ -16,7 +16,7 @@ public interface IADAlgoSolver {
      *
      * @return true if the algorithm terminates successfully
      */
-    public boolean solve(File mcoModel);
+    boolean solve(File mcoModel);
 
     /**
      * Set the parameters of the solver using the IADSolverParameters object passed.
@@ -24,12 +24,27 @@ public interface IADAlgoSolver {
      * @param solverParameters the params to to configure the solver
      * @return true if the parameters are set successfully.
      */
-    public boolean setSolverParameters(IADSolverParameters solverParameters);
+    boolean setSolverParameters(IADSolverParameters solverParameters);
 
     /**
      * Set the parameters for the alpha-delta algorithm that the solver will use during its execution
      * @param algoParameters
      * @return
      */
-    public boolean setAlgoParameters(IADAlgoParameters algoParameters);
+    boolean setAlgoParameters(IADAlgoParameters algoParameters);
+
+    /**
+     * Sets the location where the solver will store output generated during the execution of the alpha-delta algorithm
+     *
+     * @param outputPath
+     * @return
+     */
+    boolean setOutputPath(File outputPath);
+
+    /**
+     * Returns the type of this.solver, such as "CPLEX"
+     *
+     * @return
+     */
+    String getType();
 }
