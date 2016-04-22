@@ -8,6 +8,7 @@
 
 package mco.alphadelta.implementation;
 
+import ilog.concert.IloException;
 import mco.alphadelta.framework.IADAlgoInterface;
 import mco.alphadelta.framework.IADAlgoParameters;
 import mco.alphadelta.framework.IADAlgoSolver;
@@ -147,6 +148,8 @@ public class ADAlgoConsoleInterface implements IADAlgoInterface {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (IloException e) {
+            e.printStackTrace();
         }
 
         return solver;
@@ -184,7 +187,12 @@ public class ADAlgoConsoleInterface implements IADAlgoInterface {
         this.algoSolver.setAlgoParameters(this.algoParams);
         this.algoSolver.setSolverParameters(this.solverParams);
 
-        return this.algoSolver.solve(this.mcoModel);
+        try {
+            return this.algoSolver.solve(this.mcoModel);
+        } catch (IloException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public void prepAlgorithm() {
