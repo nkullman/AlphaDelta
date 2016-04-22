@@ -1,0 +1,68 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{verbatim}
+\usepackage{braket}
+\usepackage{color}
+
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+
+\begin{document}
+
+\title{Computing the Volume of a Pareto Frontier}
+\author{N. Kullman \and S. Toth}
+\maketitle
+
+%\section{Motivation}
+
+%\section{Other metrics to analyze a Pareto frontier}
+
+%\section{``Add the sides'' frontier volume computation algorithm}
+Given a set of Pareto optimal solutions $\mathcal{P}$ to a multi-objective mathematical programming model with a set of objectives $O$ of cardinality $|O| = N$, this algorithm computes the volume $V$ of the objective space bounded by the Pareto frontier defined by the solutions $x \in \mathcal{P}$. The objectives are assumed to be normalized so that the objective space is the $N$-dimensional unit hypercube with the nadir objective vector and the ideal objective vector defining the origin and the point $\vec{\mathbf{1}}$, respectively.
+
+We project the objective space into $N-1$ dimensions by eliminating the dimension associated with an (arbitrarily-chosen) objective $p \in O$. It is assumed that $x \in \mathcal{P}$ are sorted in descending order according to $p$. The algorithm proceeds by sequentially adding solutions to the ($N-1$)-dimensional space, and calculating the contribution to the frontier volume as a product of the volume contribution in $N-1$ dimensions and its achievement in objective $p$.
+
+Let
+$\overbar{V_x}$ be the ($N-1$)-dimensional volume contribution of solution $x$ and
+$x_p$ be the achievement of solution $x$ in objective $p$.
+Then the volume of the frontier is given by
+\begin{align}
+V = \sum_{x \in \mathcal{P}} \overbar{V_x} x_p
+\end{align}
+where
+\begin{align*}
+\overbar{V_x} = \left( \prod_{o \in \overbar{O}} x_o \right) - 
+  \left( \sum_{y \in P_x} \overbar{V_y} \right) + 
+  \sum_{o \in \overbar{O}}
+    \sum_{f \in \overbar{F_{x,o}}}
+      \Delta_{f^+,f}^o
+      \prod_{o' \in \overbar{O} \backslash \{o\}} f_{o'}
+\end{align*}
+where
+$\overbar{O} = O \backslash \{p\}$ is the set of objectives sans $p$; 
+$P_x = \set{y \in \mathcal{P} : y_p \ge x_p, y \neq x}$ is the set of solutions with $p$th component no less than $x_p$; and  
+$\overbar{F_{x,o}}$ is defined as
+\begin{equation}
+\begin{split}
+\overbar{F_{x,o}} = \{ y \in P_x &: \left( \exists o' \in \overbar{O} : y_{o'} \ge z_{o'} \forall z \in P_x \right) \\
+ &\quad \cap (y_o \ge x_o) \}
+\end{split}
+\end{equation}
+That is, the set $\overbar{F_{x,o}}$ is comprised of solutions with greater or equal $o$ and $p$ components than $x$ and are not dominated in the ($N-1$)-dimensional space by any solution in $P_x$.
+
+Finally, for solutions $f \in \overbar{F_{x,o}}$, we define $\Delta_{f^+,f}^o$ as
+\begin{equation}
+\Delta_{f^+,f}^o = \left( \max_{z \in \overbar{F_{x,o}^{(y)}}} z_o \right) - f_o
+\end{equation}
+where
+\begin{equation}
+\overbar{F_{x,o}^{(y)}} = \set{z \in \{x\} \cup \overbar{F_{x,o}} : z_o < y_o}
+\end{equation}
+In other words, $\Delta_{f^+,f}^o$ is the difference in the $o$th component of adjacent members in the set of solutions $\overbar{F_{x,o}}$, ordered by their $o$th components.
+
+
+\end{document}
