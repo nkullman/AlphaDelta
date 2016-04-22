@@ -12,3 +12,8 @@ bin/
 
 # ipynb checkpoints
 .ipynb_checkpoints/
+
+# unwanted latex byproducts
+*.log
+*.aux
+*.synctex.gz
