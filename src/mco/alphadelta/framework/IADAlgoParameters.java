@@ -8,10 +8,12 @@
  */
 package mco.alphadelta.framework;
 
+import java.util.ArrayList;
+
 public interface IADAlgoParameters {
 
     /**
-     *
+     * Returns the value of the tilt parameter, alpha, in units of degrees
      *
      * @return
      */
@@ -22,7 +24,7 @@ public interface IADAlgoParameters {
      *
      * @return
      */
-    double[] getDeltas();
+    ArrayList<Double> getDeltas();
 
     /**
      * Set the value for the alpha parameter (in degrees).
@@ -36,6 +38,6 @@ public interface IADAlgoParameters {
      *
      * @param deltas
      */
-    void setDeltas(double[] deltas);
+    void setDeltas(ArrayList<Double> deltas);
 
 }
