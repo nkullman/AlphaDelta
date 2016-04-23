@@ -73,11 +73,17 @@ public class ADAlgoSolver_CPLEX extends ilog.cplex.IloCplex implements IADAlgoSo
 
         cplex.importModel(mcoModel.getAbsolutePath());
 
-        // get objectives
+        // get objectives and their senses
 
-        // set objectives' senses
+        // solve for single-objective bests
 
-        //
+        // improve other objs single-objective bests (reqs all three bests to be known so that proper obj fn weights may be used)
+
+        // define ideal solution
+
+        // define nadir solution
+
+        // calculate relative deltas
 
 
         //return cplex.solve();
@@ -94,4 +100,4 @@ public class ADAlgoSolver_CPLEX extends ilog.cplex.IloCplex implements IADAlgoSo
 // TODO error handling for bad CPLEX param values
 // TODO error handling for bad algo param values
 // TODO error handling for objectives not in conflict
-
+// TODO allow for relative deltas
