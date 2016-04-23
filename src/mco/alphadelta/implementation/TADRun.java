@@ -1,6 +1,8 @@
 package mco.alphadelta.implementation;
 
-import mco.alphadelta.framework.IADAlgoInterface;
+import ilog.concert.IloException;
+
+import java.io.File;
 
 /**
  * Test class for implementing the alpha-delta algorithm.
@@ -11,12 +13,15 @@ import mco.alphadelta.framework.IADAlgoInterface;
  */
 public class TADRun {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IloException {
         // instantiate new interface
-        IADAlgoInterface algoInterface = new ADAlgoConsoleInterface();
+        //IADAlgoInterface algoInterface = new ADAlgoConsoleInterface();
         // set the parameters, model, and solver
-        algoInterface.prepAlgorithm();
+        //algoInterface.prepAlgorithm();
         // run
-        algoInterface.runSolver();
+        //algoInterface.runSolver();
+
+        ADAlgoSolver_CPLEX test = new ADAlgoSolver_CPLEX();
+        test.solve(new File("C:\\Users\\nkullman\\Desktop\\AlphaDeltaDesktopItems\\SendToEuclidForADP\\lastModelFile.lp"));
     }
 }
