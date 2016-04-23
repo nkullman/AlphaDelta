@@ -12,6 +12,7 @@ public class ADAlgoParameters implements IADAlgoParameters {
 
     private double alpha_degrees = Double.NaN;
     private ArrayList<Double> deltas = null;
+    private boolean relativeDeltas = false;
     private boolean printLogFiles = false;
     private boolean printSolFiles = true;
     private boolean hotStart = false;
@@ -64,5 +65,15 @@ public class ADAlgoParameters implements IADAlgoParameters {
     public void setHotStartModel(File hotStartModel) {
         this.hotStart = true;
         this.hotStartModel = hotStartModel;
+    }
+
+    public boolean areRelativeDeltas() {
+        return relativeDeltas;
+    }
+
+    public void setRelativeDeltas(boolean relativeDeltas) {
+        // TODO if any delta greater than 100, this is not possible
+        // get the user to re-enter delta values
+        this.relativeDeltas = relativeDeltas;
     }
 }
