@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 public class ADAlgoConsoleInterface implements IADAlgoInterface {
 
@@ -47,10 +48,10 @@ public class ADAlgoConsoleInterface implements IADAlgoInterface {
 
         try {
             String[] deltaStrings = reader.readLine().split(" ");
-            double[] deltas = new double[deltaStrings.length];
+            ArrayList<Double> deltas = new ArrayList<>();
 
-            for (int i = 0; i < deltaStrings.length; i++)
-                deltas[i] = Double.parseDouble(deltaStrings[i]);
+            for (String deltaString : deltaStrings)
+                deltas.add(Double.parseDouble(deltaString));
 
             algoParameters.setDeltas(deltas);
             System.out.println("Deltas set.");
@@ -133,7 +134,7 @@ public class ADAlgoConsoleInterface implements IADAlgoInterface {
 
     public IADAlgoSolver getADSolver() {
         IADAlgoSolver solver = null;
-        String solverString = null;
+        String solverString;
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Enter the name of the solver you would like to use:");
