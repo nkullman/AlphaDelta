@@ -1,0 +1,83 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{verbatim}
+\usepackage{braket}
+\usepackage{color}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+
+\begin{document}
+
+\title{Computing the Volume of a Pareto Frontier}
+\author{N. Kullman \and S. Toth}
+\maketitle
+
+%\section{Motivation}
+
+%\section{Other metrics to analyze a Pareto frontier}
+
+%\section{``Add the sides'' frontier volume computation algorithm}
+Given a set of Pareto optimal solutions $\mathcal{P}$ to a multi-objective mathematical programming model with a set of objectives $O$ of cardinality $N := |O|$, this algorithm computes the volume $V$ of the objective space bounded by the Pareto frontier defined by the solutions $x \in \mathcal{P}$. The objectives are assumed to be normalized so that the objective space is the $N$-dimensional unit hypercube with the nadir objective vector and the ideal objective vector defining the origin and the point $\vec{\mathbf{1}}$, respectively.
+
+We project the objective space into $N-1$ dimensions by {\color{red}eliminating} the dimension associated with an (arbitrarily-chosen) objective $p \in O$. We define the set of objectives $\overbar{O} := O \backslash \{p\}$. It is assumed that $x \in \mathcal{P}$ are sorted in descending order according to $p$. The algorithm proceeds by sequentially adding solutions to the ($N-1$)-dimensional space, and calculating the contribution to the frontier volume as a product of the volume contribution in $N-1$ dimensions and its achievement in objective $p$.
+
+Let
+$\overbar{V_x}$ be the ($N-1$)-dimensional volume contribution of solution $x$ and
+$x_p$ be the achievement of solution $x$ in objective $p$. Further, let
+$F$ be the set of non-dominated solutions in $N-1$ dimensions.
+We proceed to compute the $N$-dimensional volume of the frontier $V$ as follows.
+
+\begin{algorithm}
+\caption{Computing the volume of a Pareto frontier}
+\begin{algorithmic}[1]
+
+\State $V \gets 0$
+\State $\overbar{V} \gets 0$
+\State $F \gets \emptyset$
+
+% Iterate over each solution
+\ForAll{$x \in \mathcal{P}$}
+
+	\State $\overbar{V}_x \gets \prod_{o \in \overbar{O}} x_{o} - \overbar{V}$
+		
+	\ForAll{$f \in F$}
+		\If{$f_o < x_o \forall o \in \overbar{O}$}
+			\State $F \gets F \backslash \{f\}$
+		\EndIf
+	\EndFor
+	
+	% iterate over subdimensions to "add back the sides"	
+	\ForAll{$o \in \overbar{O}$}
+	
+		\State $F_{x,o} := \set{f \in F : f_o > x_o}$
+		
+		\State Sort $f \in F_{x,o}$ in ascending order by their $o$th component, $f_o$
+		
+		\State $v_i \gets x_o$
+		\ForAll{$f \in F_{x,o}$}
+			\State $v_t \gets f_o$
+			\State $\delta_o :	= v_t - v_i$
+			\State $\overbar{V}_x \gets \overbar{V}_x + \delta_o \prod_{\sigma \in \overbar{O} \backslash \{o\}} f_\sigma$
+			\State $v_i \gets v_t$
+		\EndFor
+		
+	\EndFor
+	
+	\State $F \gets F \cup \{x\}$
+	\State $\overbar{V} \gets \overbar{V} + \overbar{V}_x$
+	\State $V \gets V + x_p \overbar{V}_x$
+\EndFor
+
+
+\end{algorithmic}
+\end{algorithm}
+
+\end{document}
