@@ -193,6 +193,9 @@ public class ADAlgoConsoleInterface implements IADAlgoInterface {
         } catch (IloException e) {
             e.printStackTrace();
             return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
