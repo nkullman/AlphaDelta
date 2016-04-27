@@ -10,6 +10,7 @@ package mco.alphadelta.framework;
 import ilog.concert.IloException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public interface IADAlgoSolver {
     /**
@@ -18,7 +19,7 @@ public interface IADAlgoSolver {
      *
      * @return true if the algorithm terminates successfully
      */
-    boolean solve(File mcoModel) throws IloException;
+    boolean solve(File mcoModel) throws IloException, FileNotFoundException;
 
     /**
      * Set the parameters of the solver using the IADSolverParameters object passed.
