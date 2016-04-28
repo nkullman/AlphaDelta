@@ -24,6 +24,7 @@ public class ADAlgoSolver_CPLEX extends ilog.cplex.IloCplex implements IADAlgoSo
     private File originalModelFile = null;
     private File lastModelFile = null;
     private File outputPath = null;
+    private boolean outputPathSpecified = false;
     private String timeOutputPathSpecified = null;
     private ADAlgoParameters algoParameters = null;
     private ADSolverCPLEXParameters cplexParameters = null;
@@ -33,6 +34,7 @@ public class ADAlgoSolver_CPLEX extends ilog.cplex.IloCplex implements IADAlgoSo
     private Map<String, Integer> objectiveColumns = null;
     private Map<String, Double> objectiveIdeals = null;
     private Map<String, Double> objectiveNadirs = null;
+    private IloLPMatrix baseLPMatrix = null;
 
     public ADAlgoSolver_CPLEX() throws IloException {
 
@@ -149,6 +151,7 @@ public class ADAlgoSolver_CPLEX extends ilog.cplex.IloCplex implements IADAlgoSo
 
         // set that folder to our output folder
         this.outputPath = outDir;
+        this.outputPathSpecified = true;
         return true;
     }
 
@@ -159,6 +162,11 @@ public class ADAlgoSolver_CPLEX extends ilog.cplex.IloCplex implements IADAlgoSo
 
     @Override
     public boolean solve(File mcoModel) throws IloException {
+
+        // set the output directory if it has not already been set
+        if (!outputPathSpecified) setOutputPath(this.outputPath);
+
+
         // the below procedure will need to be altered in the event of a hot start
 
         this.originalModelFile = mcoModel;
@@ -166,14 +174,18 @@ public class ADAlgoSolver_CPLEX extends ilog.cplex.IloCplex implements IADAlgoSo
 
         cplex.importModel(mcoModel.getAbsolutePath());
 
+        // store the LP matrix
+        this.baseLPMatrix = (IloLPMatrix) cplex.LPMatrixIterator().next();
+
         // record the objectives and their senses (max or min)
         getObjsAndSenses(cplex.getObjective());
 
         // solve for single-objective bests
         for (String objective : this.objectives)
-            getSingleObjectiveBests(cplex, objective);
+            getSingleObjectiveBest(cplex, objective);
 
         // improve other objs single-objective bests (reqs all three bests to be known so that proper obj fn weights may be used)
+        improveSecondaryVarsInIdealSolution(cplex, objectiveIdeals);
 
         // define ideal solution
 
@@ -186,16 +198,110 @@ public class ADAlgoSolver_CPLEX extends ilog.cplex.IloCplex implements IADAlgoSo
         return false;
     }
 
-    private boolean getSingleObjectiveBests(IloCplex cplex, String objective) {
+    private boolean improveSecondaryVarsInIdealSolution(IloCplex cplex, Map<String, Double> objectiveIdeals) {
+
+        // temporarily reset the solver parameters to those specific to the construction of the ideal solution
+        if (this.algoParameters != null && this.algoParameters.getSolverParamsForIdealConstruction() != null)
+            assignSolverParameters(this.cplex,
+                    (ADSolverCPLEXParameters) this.algoParameters.getSolverParamsForIdealConstruction());
+
+        // iterate over objectives, improving each's ideal solution as we go
+        for (String objective : objectiveIdeals.keySet()) {
+
+            try {
+                // TODO remove temp time limit and opt gap
+                cplex.setParam(DoubleParam.TiLim, 300);
+                cplex.setParam(DoubleParam.EpGap, .05);
+
+                // construct objective function with a term for each of the other objectives
+                IloLinearNumExpr newObj = cplex.linearNumExpr();
+                for (String secondaryObj : objectiveSenses.keySet()) {
+                    if (secondaryObj.equals(objective)) continue;
+
+                    double objWeight = (1 / (numObjectives - 1)) * // equal weight given to each secondary objective
+                            ((objectiveSenses.get(secondaryObj) > 0) ? 1 : -1) * // assign the proper sign (pos or neg)
+                            ((this.objectiveIdeals.get(secondaryObj) == 0) ? 1 : (1 / this.objectiveIdeals.get(secondaryObj))); // scale it based on ideal value (or 1 if ideal would throw error)
+                    newObj.addTerm(objWeight,
+                            this.baseLPMatrix.getNumVar(objectiveColumns.get(secondaryObj)));
+                }
+                // remove previous objective function
+                cplex.remove(cplex.getObjective());
+                // reassign the new one
+                cplex.add(cplex.objective(IloObjectiveSense.Maximize, newObj, "objective"));
+
+                // add a constraint to hold the primary objective at its ideal value
+                IloLinearNumExpr objConstraint = cplex.linearNumExpr();
+                objConstraint.addTerm(1, this.baseLPMatrix.getNumVar(objectiveColumns.get(objective)));
+                if (objectiveSenses.get(objective) == 1)
+                    cplex.addGe(objConstraint, objectiveIdeals.get(objective));
+                else
+                    cplex.addLe(objConstraint, objectiveIdeals.get(objective));
+
+                // read in a MIP start to help the solution along
+                cplex.readMIPStarts(outputPath.toString() + "/singleObjMipStart_" + objective + ".mst");
+                // solve the LP
+                if (cplex.solve()) {
+                    System.out.println("Ideal improved for " + objective);
+
+                    // store the nadir values for the other objectives
+                    for (String secondaryObj : objectiveIdeals.keySet()) {
+                        if (secondaryObj.equals(objective)) continue;
+
+                        double secondaryObjVal = cplex.getValue(this.baseLPMatrix.getNumVar(objectiveColumns.get(secondaryObj)));
+
+                        // if the nadir value does not already exist for the objective,
+                        // then assign it to the new one
+                        if (!objectiveNadirs.containsKey(secondaryObj))
+                            objectiveNadirs.put(secondaryObj, secondaryObjVal);
+                        else {
+                            // if the solution is worse than the previous,
+                            // then assign it to be the new nadir value for the objective
+                            if (objectiveSenses.get(secondaryObj) == 1 && secondaryObjVal < objectiveNadirs.get(secondaryObj)) {
+                                objectiveNadirs.put(secondaryObj, secondaryObjVal);
+                            } else if (objectiveSenses.get(secondaryObj) == 0 && secondaryObjVal > objectiveNadirs.get(secondaryObj)) {
+                                objectiveNadirs.put(secondaryObj, secondaryObjVal);
+                            }
+                        }
+                    }
+                } else {
+                    System.out.println("In ideal solution construction, could not improve for objective " + objective);
+                }
+                // clear mipstarts
+                if (cplex.getNMIPStarts() > 0)
+                    cplex.deleteMIPStarts(0, cplex.getNMIPStarts());
+                // remove the newly added constraint the LP matrix
+                ((IloLPMatrix) cplex.LPMatrixIterator().next()).removeRow(((IloLPMatrix) cplex.LPMatrixIterator().next()).getNrows() - 1);
+
+                System.out.println("Ideals: " + objectiveIdeals.toString());
+                System.out.println("Nadirs: " + objectiveNadirs.toString());
+            } catch (IloException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        // return the solver parameters to their original values
+        if (this.cplexParameters != null)
+            assignSolverParameters(this.cplex, this.cplexParameters);
+
+        return true;
+    }
+
+    private boolean getSingleObjectiveBest(IloCplex cplex, String objective) {
         // temporarily reset the solver parameters to those specific to the construction of the ideal solution
         if (this.algoParameters != null && this.algoParameters.getSolverParamsForIdealConstruction() != null)
             assignSolverParameters(this.cplex,
                     (ADSolverCPLEXParameters) this.algoParameters.getSolverParamsForIdealConstruction());
 
         try {
+
+            // TODO remove temp time limit and opt gap
+            cplex.setParam(DoubleParam.TiLim, 300);
+            cplex.setParam(DoubleParam.EpGap, .05);
+
             // construct single-objective objective function
             IloLinearNumExpr newObj = cplex.linearNumExpr();
-            newObj.addTerm(1, ((IloLPMatrix) cplex.LPMatrixIterator().next()).getNumVar(objectiveColumns.get(objective)));
+            newObj.addTerm(1, this.baseLPMatrix.getNumVar(objectiveColumns.get(objective)));
             // remove previous objective function
             cplex.remove(cplex.getObjective());
             // reassign the new one
@@ -204,6 +310,12 @@ public class ADAlgoSolver_CPLEX extends ilog.cplex.IloCplex implements IADAlgoSo
             if (cplex.solve()) {
                 // store the ideal value for this objective
                 this.objectiveIdeals.put(objective, cplex.getObjValue());
+                System.out.println("Ideal value for " + objective + ": " + cplex.getObjValue());
+                // save the mipstarts for when we go back to improve the solution later
+                cplex.writeMIPStarts(outputPath.toString() + "/singleObjMipStart_" + objective + ".mst");
+            } else {
+                System.out.println("In ideal solution construction, could not solve for objective " + objective);
+                return false;
             }
         } catch (IloException e) {
             e.printStackTrace();
