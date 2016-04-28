@@ -22,6 +22,6 @@ public class TADRun {
         //algoInterface.runSolver();
 
         ADAlgoSolver_CPLEX test = new ADAlgoSolver_CPLEX();
-        test.solve(new File("C:\\Users\\nkullman\\Desktop\\AlphaDeltaDesktopItems\\SendToEuclidForADP\\lastModelFile.lp"));
+        test.solve(new File("C:\\Users\\nkullman\\Desktop\\AlphaDeltaDesktopItems\\SendToEuclidForADP\\FromFirstRun\\improvedTestModel_NewOWlObj_Ensemble_rcp85.txt"));
     }
 }
