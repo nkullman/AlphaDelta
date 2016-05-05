@@ -187,15 +187,30 @@ public class ADAlgoSolver_CPLEX extends ilog.cplex.IloCplex implements IADAlgoSo
         // improve other objs single-objective bests (reqs all three bests to be known so that proper obj fn weights may be used)
         improveSecondaryVarsInIdealSolution(cplex, objectiveIdeals);
 
-        // define ideal solution
+        // adjust detlas if relative values were specified
+        if (this.algoParameters.areRelativeDeltas())
+            this.algoParameters.setDeltas(getRelativeDeltaValues());
 
-        // define nadir solution
+        // set objective function for frontier generation
+        // setFrontierObjectiveFunction();
 
-        // calculate relative deltas
-
+        // generate frontier
+        // boolean newPointFound = true;
+        // while (newPointFound){
+        // findNextFrontierPoint();
+        //}
 
         //return cplex.solve();
         return false;
+    }
+
+    private ArrayList<Double> getRelativeDeltaValues() {
+        ArrayList<Double> result = new ArrayList<>();
+
+        // for each objective, set its delta value
+        // to: abs(range of values for that obj)*current delta value (which is a relative delta)
+
+        return result;
     }
 
     private boolean improveSecondaryVarsInIdealSolution(IloCplex cplex, Map<String, Double> objectiveIdeals) {
@@ -395,3 +410,4 @@ public class ADAlgoSolver_CPLEX extends ilog.cplex.IloCplex implements IADAlgoSo
 // TODO error handling for objectives not in conflict
 // TODO allow for relative deltas
 // TODO update manual to require all obj coeffs to have appropriate nonzero coefficients
+// TODO migrate deltas from arraylist to dictionary
