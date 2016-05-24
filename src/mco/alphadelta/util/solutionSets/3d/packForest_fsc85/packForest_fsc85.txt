@@ -1,4 +1,4 @@
-SolutionIndex,NPV ($1,000),Carbon (1,000 MgT),Habitat (ac)
+SolutionIndex,NPV(1000USD),Carbon(1000MgT),Habitat(ac)
 1,-4541.139,528.2014,407.41
 3,-4541.139,528.2014,407.41
 42,-3352.892,508.2143,407.41
